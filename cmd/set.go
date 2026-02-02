@@ -1,9 +1,9 @@
 package main
 
 import (
-	"Velocidex/disklru"
 	"context"
 
+	"github.com/Velocidex/disklru"
 	"github.com/alecthomas/kingpin"
 )
 

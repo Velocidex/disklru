@@ -136,6 +136,8 @@ type CacheItem struct {
 }
 
 func (self *DiskLRU) Items() (res []CacheItem) {
+	now := time.Now()
+
 	rows, err := self.handle.Query("SELECT key, value FROM cache")
 	if err != nil {
 		return
@@ -160,7 +162,8 @@ func (self *DiskLRU) Items() (res []CacheItem) {
 		})
 	}
 
-	self.Debug("Items call returned %v items", len(res))
+	self.Debug("Items call returned %v items in %v", len(res),
+		time.Now().Sub(now).Round(time.Millisecond).String())
 
 	return res
 }

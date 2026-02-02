@@ -1,10 +1,10 @@
 package main
 
 import (
-	"Velocidex/disklru"
 	"context"
 	"fmt"
 
+	"github.com/Velocidex/disklru"
 	"github.com/alecthomas/kingpin"
 )
 

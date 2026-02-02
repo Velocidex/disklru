@@ -1,4 +1,4 @@
-module Velocidex/disklru
+module github.com/Velocidex/disklru
 
 go 1.25.3
 
