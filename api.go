@@ -272,6 +272,10 @@ func NewDiskLRU(
 		return nil, err
 	}
 
+	if opts.ClearOnStart {
+		self.clear_stm.Exec()
+	}
+
 	// Run the housekeep thread
 	go self.houseKeeping(sub_ctx)
 
