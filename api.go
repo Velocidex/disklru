@@ -20,7 +20,7 @@ type DiskLRU struct {
 	encoder Encoder
 
 	set_stm, get_stm, get_update_expiry_stm,
-	peek_stm, delete_stm,
+	peek_stm, delete_stm, purge_stm,
 	clear_stm, cleanup_expires_stm,
 	cleanup_lru_stm *sql.Stmt
 
@@ -41,6 +41,10 @@ func (self *DiskLRU) HouseKeepOnce() {
 func (self *DiskLRU) houseKeeping(ctx context.Context) {
 	if self.opts.HouseKeepPeriodSec < 0 {
 		return
+	}
+
+	if self.opts.HouseKeepPeriodSec == 0 {
+		self.opts.HouseKeepPeriodSec = 60
 	}
 
 	for {
@@ -128,6 +132,11 @@ func (self *DiskLRU) Get(key string) (interface{}, error) {
 	self.hit.Inc()
 	self.Debug("Get Key %v: %v", key, string(buf))
 	return self.encoder.Decode(buf)
+}
+
+func (self *DiskLRU) Purge() error {
+	_, err := self.purge_stm.Exec()
+	return err
 }
 
 type CacheItem struct {
@@ -247,6 +256,12 @@ func NewDiskLRU(
 
 	self.delete_stm, err = handle.Prepare(
 		`DELETE FROM cache WHERE key = @key`)
+	if err != nil {
+		return nil, err
+	}
+
+	self.purge_stm, err = handle.Prepare(
+		`DELETE FROM cache`)
 	if err != nil {
 		return nil, err
 	}
